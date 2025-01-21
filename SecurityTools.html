@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramientas de Seguridad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Bebas Neue', cursive;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #2d2d2d, #3c3c3c);
+            color: rgb(51, 50, 50);
+            overflow-x: hidden;
+        }
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #222;
+            width: 80%;
+            padding: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .tab {
+            background-color: #444;
+            color: white;
+            padding: 12px 25px;
+            margin: 0 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 18px;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .tab:hover {
+            background-color: #28a745;
+            transform: scale(1.1);
+        }
+        .active-tab {
+            background-color: #28a745;
+            color: white;
+        }
+        .content {
+            display: none;
+            padding: 25px;
+            background-color: white;
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .content.active-content {
+            display: block;
+        }
+        .btn {
+            padding: 12px 25px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        .result {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 95%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #ccc;
+            border-radius: 2px;
+            font-size: 18px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #28a745;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+        #passwordStrength {
+            height: 10px;
+            width: 100%;
+            background-color: #ddd;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #passwordStrength > div {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .tab i, .btn i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SECURITY TOOLS</h1>
+</header>
+
+<div class="container">
+    <!-- Pestañas de navegación -->
+    <div class="tabs">
+        <div class="tab active-tab" onclick="showTab('tab1')"><i class="fas fa-key icon"></i>Password Generator</div>
+        <div class="tab" onclick="showTab('tab2')"><i class="fas fa-shield-alt icon"></i>Password Check</div>
+        <div class="tab" onclick="showTab('tab3')"><i class="fas fa-user-cog icon"></i>Generate Account</div>
+    </div>
+
+    <!-- Contenido de las pestañas -->
+    <div class="content active-content" id="tab1">
+        <h2>Password Generator</h2>
+        <button class="btn" onclick="generarContraseña()">Generate Secure Password</button>
+        <input type="text" id="generatedPassword" readonly>
+    </div>
+
+    <div class="content" id="tab2">
+        <h2>Password Strength Check</h2>
+        <input type="password" id="passwordStrengthInput" placeholder="Your Password">
+        <button class="btn" onclick="comprobarFuerza()">Check Strength</button>
+        <div id="passwordStrength">
+            <div id="strengthMeter"></div>
+        </div>
+        <p id="strengthResult" class="result"></p>
+    </div>
+
+    <div class="content" id="tab3">
+        <h2>Random Account Generator</h2>
+        <button class="btn" onclick="generarCuenta()">Generate Account</button>
+        <p id="accountResult" class="result"></p>
+    </div>
+</div>
+
+<script>
+    // Cambiar entre pestañas
+    function showTab(tabId) {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+        
+        tabs.forEach(tab => tab.classList.remove('active-tab'));
+        contents.forEach(content => content.classList.remove('active-content'));
+        
+        document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active-tab');
+        document.getElementById(tabId).classList.add('active-content');
+    }
+
+    // Generar contraseña segura
+    function generarContraseña() {
+        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?";
+        let contraseña = "";
+        for (let i = 0; i < 12; i++) {
+            contraseña += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        document.getElementById("generatedPassword").value = contraseña;
+    }
+
+    // Comprobar fuerza de la contraseña
+    function comprobarFuerza() {
+        const password = document.getElementById("passwordStrengthInput").value;
+        const strengthMeter = document.getElementById("strengthMeter");
+        const strengthResult = document.getElementById("strengthResult");
+
+        let strength = 0;
+        const regexLower = /[a-z]/;
+        const regexUpper = /[A-Z]/;
+        const regexNumber = /[0-9]/;
+        const regexSpecial = /[!@#$%^&*(),.?":{}|<>]/;
+
+        if (password.length >= 8) strength++;
+        if (regexLower.test(password)) strength++;
+        if (regexUpper.test(password)) strength++;
+        if (regexNumber.test(password)) strength++;
+        if (regexSpecial.test(password)) strength++;
+
+        strengthMeter.style.width = `${(strength / 5) * 100}%`;
+
+        if (strength === 5) {
+            strengthMeter.style.backgroundColor = "green";
+            strengthResult.textContent = "Very strong password";
+            strengthResult.style.color = "green";
+        } else if (strength >= 3) {
+            strengthMeter.style.backgroundColor = "yellow";
+            strengthResult.textContent = "Secure password";
+            strengthResult.style.color = "yellow";
+        } else if (strength >= 1) {
+            strengthMeter.style.backgroundColor = "orange";
+            strengthResult.textContent = "Weak password";
+            strengthResult.style.color = "orange";
+        } else {
+            strengthMeter.style.backgroundColor = "red";
+            strengthResult.textContent = "Very weak password";
+            strengthResult.style.color = "red";
+        }
+    }
+
+    // Generar cuenta aleatoria
+    function generarCuenta() {
+        const nombres = ['Juan', 'Ana', 'Carlos', 'Marta', 'Pedro', 'Lucía', 'David', 'Laura', 'Sofía', 'Luis', 'Aisha', 'Hiroshi', 'Fatima', 'Dmitry', 'Chiara', 'Ahmed', 'Yuki', 'Amara', 'Omar', 'Zara', 'Diego', 'Mei', 'Hans', 'Priya', 'Ali', 'Elena', 'Santiago', 'Nina', 'Ismael', 'Ravi', 'Ewa', 'Leila', 'Nikolai', 'Emma', 'Aarav', 'Liam', 'Chloe', 'Hassan', 'Maria', 'Oliver', 'Aria', 'Ethan', 'Sophia', 'Noah', 'Zane', 'Isabella', 'Sebastian', 'Aya', 'Gabriel', 'Layla', 'Mateo', 'Eva', 'Leo', 'Ines', 'Finn', 'Yara', 'Luca', 'Mia', 'Aliya', 'Javier', 'Nora', 'Aditya', 'Khalid', 'Rosa', 'Oscar', 'Hana', 'Amir', 'Elsa', 'Theo', 'Sara', 'Pablo', 'Jade', 'Marcel', 'Lila', 'Tariq', 'Elisa', 'Hugo', 'Nadia', 'Sami', 'Irene', 'Julian', 'Khadija', 'Viktor', 'Helena', 'Marek', 'Anya', 'Rosa', 'Alexei', 'Mariam', 'Carlos', 'Fiona', 'Ivan', 'Dalia', 'Tobias', 'Yasmine', 'Milos', 'Isla', 'Johan', 'Amina', 'Rafael', 'Lana', 'Cristina','Juan', 'Ana', 'Carlos', 'Marta', 'Pedro', 'Lucía', 'David', 'Laura', 'Sofía', 'Luis', 'Aisha', 'Hiroshi', 'Fatima', 'Dmitry', 'Chiara', 'Ahmed', 'Yuki', 'Amara', 'Omar', 'Zara', 'Diego', 'Mei', 'Hans', 'Priya', 'Ali', 'Elena', 'Santiago', 'Nina', 'Ismael', 'Ravi', 'Ewa', 'Leila', 'Nikolai', 'Emma', 'Aarav', 'Liam', 'Chloe', 'Hassan', 'Maria', 'Oliver', 'Aria', 'Ethan', 'Sophia', 'Noah', 'Zane', 'Isabella', 'Sebastian', 'Aya', 'Gabriel', 'Layla', 'Mateo', 'Eva', 'Leo', 'Ines', 'Finn', 'Yara', 'Luca', 'Mia', 'Aliya', 'Javier', 'Nora', 'Aditya', 'Khalid', 'Rosa', 'Oscar', 'Hana', 'Amir', 'Elsa', 'Theo', 'Sara', 'Pablo', 'Jade', 'Marcel', 'Lila', 'Tariq', 'Elisa', 'Hugo', 'Nadia', 'Sami', 'Irene', 'Julian', 'Khadija', 'Viktor', 'Helena', 'Marek', 'Anya', 'Rosa', 'Alexei', 'Mariam', 'Carlos', 'Fiona', 'Ivan', 'Dalia', 'Tobias', 'Yasmine', 'Milos', 'Isla', 'Johan', 'Amina', 'Rafael', 'Lana', 'Cristina'];
+        const apellidos = ['Gómez', 'Pérez', 'Martínez', 'López', 'García', 'Hernández', 'Rodríguez', 'Díaz', 'Moreno', 'Ruiz', 'Smith', 'Johnson', 'Brown', 'Williams', 'Jones', 'Miller', 'Davis', 'Taylor', 'Anderson', 'Thomas', 'Lee', 'Kim', 'Park', 'Chen', 'Zhang', 'Wang', 'Liu', 'Nguyen', 'Tran', 'Kumar', 'Patel', 'Sharma', 'Singh', 'Gupta', 'Takahashi', 'Tanaka', 'Yamamoto', 'Kobayashi', 'Huang', 'Lin', 'Choi', 'López', 'González', 'Alvarez', 'Torres', 'Castillo', 'Ortiz', 'Ramírez', 'Morales', 'Flores', 'Vargas', 'Fernández', 'Castro', 'Silva', 'Rojas', 'Santos', 'Mendoza', 'Rivera', 'Cruz', 'Reyes', 'Moreno', 'Herrera', 'Jiménez', 'Guzmán', 'Martins', 'Costa', 'Oliveira', 'Sousa', 'Pereira', 'da Silva', 'Moreira', 'Ferreira', 'Lima', 'Nunes', 'Correia', 'Barbosa', 'Monteiro', 'Carvalho', 'Schmidt', 'Müller', 'Klein', 'Weber', 'Schneider', 'Fischer', 'Wolf', 'Bauer', 'Hoffmann', 'Neumann', 'Lindberg', 'Nilsson', 'Andersson', 'Larsson', 'Eriksson', 'Jansson', 'Karlsson', 'Olsen', 'Hansen', 'Kristensen', 'Pedersen', 'Jensen', 'Gómez', 'Pérez', 'Martínez', 'López', 'García', 'Hernández', 'Rodríguez', 'Díaz', 'Moreno', 'Ruiz', 'Smith', 'Johnson', 'Brown', 'Williams', 'Jones', 'Miller', 'Davis', 'Taylor', 'Anderson', 'Thomas', 'Lee', 'Kim', 'Park', 'Chen', 'Zhang', 'Wang', 'Liu', 'Nguyen', 'Tran', 'Kumar', 'Patel', 'Sharma', 'Singh', 'Gupta', 'Takahashi', 'Tanaka', 'Yamamoto', 'Kobayashi', 'Huang', 'Lin', 'Choi', 'López', 'González', 'Alvarez', 'Torres', 'Castillo', 'Ortiz', 'Ramírez', 'Morales', 'Flores', 'Vargas', 'Fernández', 'Castro', 'Silva', 'Rojas', 'Santos', 'Mendoza', 'Rivera', 'Cruz', 'Reyes', 'Moreno', 'Herrera', 'Jiménez', 'Guzmán', 'Martins', 'Costa', 'Oliveira', 'Sousa', 'Pereira', 'da Silva', 'Moreira', 'Ferreira', 'Lima', 'Nunes', 'Correia', 'Barbosa', 'Monteiro', 'Carvalho', 'Schmidt', 'Müller', 'Klein', 'Weber', 'Schneider', 'Fischer', 'Wolf', 'Bauer', 'Hoffmann', 'Neumann', 'Lindberg', 'Nilsson', 'Andersson', 'Larsson', 'Eriksson', 'Jansson', 'Karlsson', 'Olsen', 'Hansen', 'Kristensen', 'Pedersen', 'Jensen'];
+        const nombresAleatorios = nombres[Math.floor(Math.random() * nombres.length)];
+        const apellidosAleatorios = apellidos[Math.floor(Math.random() * apellidos.length)];
+
+        const correo = `${nombresAleatorios.toLowerCase()}.${apellidosAleatorios.toLowerCase()}@gmail.com`;
+        const telefono = `+34 ${Math.floor(Math.random() * 900000000) + 600000000}`;
+        const username = `${nombresAleatorios.toLowerCase()}${apellidosAleatorios.toLowerCase()}${Math.floor(Math.random() * 1000)}`;
+        const password = generarContraseñaAleatoria();
+
+        document.getElementById("accountResult").innerHTML = `
+            <strong>Cuenta Generada:</strong><br>
+            Nombre: ${nombresAleatorios} ${apellidosAleatorios}<br>
+            Correo: <a href="mailto:${correo}">${correo}</a><br>
+            Teléfono: ${telefono}<br>
+            Nombre de usuario: ${username}<br>
+            Contraseña: ${password}<br>
+        `;
+    }
+
+    // Generar una contraseña aleatoria
+    function generarContraseñaAleatoria() {
+        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?";
+        let contraseña = "";
+        for (let i = 0; i < 12; i++) {
+            contraseña += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return contraseña;
+    }
+</script>
+
+</body>
+</html>
